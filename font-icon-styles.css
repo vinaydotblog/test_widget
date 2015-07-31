@@ -1,0 +1,275 @@
+@font-face {
+    font-family: 'amex-ui-kit-font';
+    src:url('fonts/amex-ui-kit-font.eot?4uf9m5');
+    src:url('fonts/amex-ui-kit-font.eot?#iefix4uf9m5') format('embedded-opentype'),
+    url('fonts/amex-ui-kit-font.woff?4uf9m5') format('woff'),
+    url('fonts/amex-ui-kit-font.ttf?4uf9m5') format('truetype'),
+    url('fonts/amex-ui-kit-font.svg?4uf9m5#amex-ui-kit-font') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    font-family: 'amex-ui-kit-font';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-alert-empty:before {
+    content: "\e600";
+}
+
+.icon-alert-fill:before {
+    content: "\e601";
+}
+
+.icon-alert-general-empty:before {
+    content: "\e602";
+}
+
+.icon-alert-general-fill:before {
+    content: "\e603";
+}
+
+.icon-autopayment:before {
+    content: "\e604";
+}
+
+.icon-bookmark-multi:before {
+    content: "\e605";
+}
+
+.icon-bookmark-single:before {
+    content: "\e606";
+}
+
+.icon-calendar:before {
+    content: "\e607";
+}
+
+.icon-cart:before {
+    content: "\e608";
+}
+
+.icon-checkbox-checked-empty:before {
+    content: "\e609";
+}
+
+.icon-checkbox-checked:before {
+    content: "\e60a";
+}
+
+.icon-checkbox-unchecked:before {
+    content: "\e60b";
+}
+
+.icon-checkmark-circle-empty:before {
+    content: "\e60c";
+}
+
+.icon-checkmark-circle-fill:before {
+    content: "\e60d";
+}
+
+.icon-checkmark-fill:before {
+    content: "\e60e";
+}
+
+.icon-chevron-down:before {
+    content: "\e60f";
+}
+
+.icon-chevron-right:before {
+    content: "\e610";
+}
+
+.icon-chevron-up:before {
+    content: "\e611";
+}
+
+.icon-close-fill:before {
+    content: "\e612";
+}
+
+.icon-core-auto:before {
+    content: "\e613";
+}
+
+.icon-core-benefits:before {
+    content: "\e614";
+}
+
+.icon-core-dining:before {
+    content: "\e615";
+}
+
+.icon-core-entertainment:before {
+    content: "\e616";
+}
+
+.icon-core-offer:before {
+    content: "\e617";
+}
+
+.icon-core-rewards:before {
+    content: "\e618";
+}
+
+.icon-core-services:before {
+    content: "\e619";
+}
+
+.icon-core-shopping:before {
+    content: "\e61a";
+}
+
+.icon-core-travel:before {
+    content: "\e61b";
+}
+
+.icon-core-wholesale:before {
+    content: "\e61c";
+}
+
+.icon-creditcard:before {
+    content: "\e61d";
+}
+
+.icon-document-acrobat:before {
+    content: "\e61e";
+}
+
+.icon-document:before {
+    content: "\e61f";
+}
+
+.icon-flip:before {
+    content: "\e620";
+}
+
+.icon-graph:before {
+    content: "\e621";
+}
+
+.icon-heart-empty:before {
+    content: "\e622";
+}
+
+.icon-heart-fill:before {
+    content: "\e623";
+}
+
+.icon-locked:before {
+    content: "\e624";
+}
+
+.icon-minus:before {
+    content: "\e625";
+}
+
+.icon-plus:before {
+    content: "\e626";
+}
+
+.icon-print:before {
+    content: "\e627";
+}
+
+.icon-question-empty:before {
+    content: "\e628";
+}
+
+.icon-question-fill:before {
+    content: "\e629";
+}
+
+.icon-radio-checked .path1:before {
+    content: "\e62a";
+    color: rgb(0, 0, 0);
+}
+.icon-radio-checked .path2:before {
+    content: "\e62b";
+    margin-left: -1em;
+    color: rgb(255, 255, 255);
+}
+
+.icon-radio-unchecked:before {
+    content: "\e62c";
+}
+
+.icon-search:before {
+    content: "\e62d";
+}
+
+.icon-social-facebook:before {
+    content: "\e62e";
+}
+
+.icon-social-gplus:before {
+    content: "\e62f";
+}
+
+.icon-social-instagram:before {
+    content: "\e630";
+}
+
+.icon-social-linkedin:before {
+    content: "\e631";
+}
+
+.icon-social-pinterest:before {
+    content: "\e632";
+}
+
+.icon-social-twitter:before {
+    content: "\e633";
+}
+
+.icon-social-youtube:before {
+    content: "\e634";
+}
+
+.icon-star-empty:before {
+    content: "\e635";
+}
+
+.icon-star-fill:before {
+    content: "\e636";
+}
+
+.icon-supp:before {
+    content: "\e637";
+}
+
+.icon-tag-multi:before {
+    content: "\e638";
+}
+
+.icon-tag-single:before {
+    content: "\e639";
+}
+
+.icon-time:before {
+    content: "\e63a";
+}
+
+.icon-tooltip-close:before {
+    content: "\e63b";
+}
+
+.icon-tooltip-empty:before {
+    content: "\e63c";
+}
+
+.icon-unlocked:before {
+    content: "\e63d";
+}
+

@@ -1,0 +1,56 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <title>Calendar Widget</title>
+            <link rel="stylesheet" href="calendar.css" />
+            <link rel="stylesheet" type="text/css" href="font.css" media="screen" />
+            <link rel="stylesheet" type="text/css" href="font-icon-styles.css" media="screen" />
+        </head>
+        <body>
+
+        <!--Start of Calendar Widget -->
+
+        <div id="cal-widget">
+                <h2>Select a Payment Date</h2>
+            <div class="cal-container">
+                <div class="cal-header">
+                    <a href="#" class="prev">Previous</a>
+                    <span class="cal-month-year">
+                        JULY 2015
+                    </span>
+                    <a href="#" class="next">Next</a>
+                </div>
+                <div id="cal-frame">
+                    <table id="cal-data">
+                        <thead class="cal-days">
+                        <tr>
+                            <th><span>SUN</span></th>
+                            <th><span>MON</span></th>
+                            <th><span>TUE</span></th>
+                            <th><span>WED</span></th>
+                            <th><span>THU</span></th>
+                            <th><span>FRI</span></th>
+                            <th><span>SAT</span></th>
+                        </tr>
+                        </thead>
+
+                    </table>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+        <!-- End of Calendar Widget -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script type="text/javascript" src="calendar.js"></script>
+        <script>
+            var cal = CALENDAR();
+
+            cal.init();
+        </script>
+        </body>
+        </html>
