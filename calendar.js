@@ -21,6 +21,38 @@ var CALENDAR = function () {
         }
     }
 
+// `tmpl()` is for attaching the function in jquery and develoer could use it in this page anywhere
+var tmpl = function(template, data) {
+    var i = 0,
+            len = data.length,
+            fragment = '';
+    // For each item in the object, make the necessary replacement
+    function replace(obj) {
+        var t, key, reg;
+        for (key in obj) {
+            reg = new RegExp('{{' + key + '}}', 'ig');
+            t = (t || template).replace(reg, obj[key]);
+        }
+        return t;
+    }
+    for (; i < len; i++) {
+        fragment += replace(data[i]);
+    }
+    return fragment;
+};
+
+function formatEvents(events){
+    return events.map(function(event){
+        var date = new Date(event.date);
+
+        return {
+            month : date.getMonth() + 1,
+            day : date.getDate(),
+            title : event.title
+        };
+    });
+}
+
     function loadEvents(){
         var canvas_template = $(options.event_canvas).html();
 
@@ -30,7 +62,7 @@ var CALENDAR = function () {
             url : options.remote_events,
             dataType : 'json',
             success : function(events){
-                console.log(events);
+                console.log( formatEvents(events) );
             }
         });
     }
