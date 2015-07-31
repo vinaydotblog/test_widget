@@ -1,20 +1,24 @@
 var CALENDAR = function () {
-    var wrap, label,
+    var wrap = $(), label,
         options,
         canvas,
         canvas_template,
         container,
+        cur_month, cur_year
         months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     function init(opts) {
 
         options = opts;
 
+        cur_month = new Date().getMonth();
+        cur_year =  new Date().getFullYear();
+
         wrap  = $(options.elem);
         label = wrap.find(".cal-month-year");
         wrap.find(".prev").bind("click.calendar", function () { switchMonth(false); });
         wrap.find(".next").bind("click.calendar", function () { switchMonth(true);  });
-        label.bind("click", function () { switchMonth(null, new Date().getMonth(), new Date().getFullYear()); });
+        label.bind("click", function () { switchMonth(null, cur_month, cur_year); });
         label.click();
        console.log(wrap);
         console.log(label);
@@ -25,7 +29,12 @@ var CALENDAR = function () {
             canvas_template = canvas.html(),
             container = canvas.parent();
 
-            loadEvents()
+            loadEvents(cur_month, cur_year);
+
+            // load events even on calendar change
+            wrap.bind('change', function(e, month, year){
+                loadEvents(cur_month, cur_year);
+            });
         }
     }
 
@@ -61,11 +70,12 @@ function formatEvents(events){
     });
 }
 
-    function loadEvents(){
+    function loadEvents(m, y){
 
         $.ajax({
             url : options.remote_events,
             dataType : 'json',
+            data : { month : m, year : y }, // load events for current month
             success : function(events){
                 var events_html = tmpl( canvas_template,  formatEvents(events) );
 
@@ -80,8 +90,15 @@ function formatEvents(events){
         month = month || ((next) ? ((curr[0] === "December") ? 0 : months.indexOf(curr[0]) + 1) : ( (curr[0] === "January") ? 11 : months.indexOf(curr[0]) - 1) );
         year  = year  || ((next && month === 0) ? tempYear + 1 : (!next && month === 11) ? tempYear -1 : tempYear);
 
+        cur_month = month;
+        cur_year = cur_year;
+
         console.log(month);
         console.log(year);
+
+        // Emmit events whenver there is change in calendar date,
+        // so we can later do things by subscribing to these events
+        wrap.trigger('change', [month, year]);
 
         console.profile("createCal");
         calendar = createCal(year, month);
