@@ -54,7 +54,7 @@ function formatEvents(events){
         var date = new Date(event.date);
 
         return {
-            month : date.getMonth() + 1,
+            month : months[date.getMonth()],
             day : date.getDate(),
             title : event.title
         };
