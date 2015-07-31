@@ -3,7 +3,9 @@ var CALENDAR = function () {
         options,
         months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    function init(options) {
+    function init(opts) {
+
+        options = opts;
 
         wrap  = $(options.elem);
         label = wrap.find(".cal-month-year");
@@ -13,6 +15,24 @@ var CALENDAR = function () {
         label.click();
        console.log(wrap);
         console.log(label);
+
+        if( options.event_canvas ) {
+            loadEvents()
+        }
+    }
+
+    function loadEvents(){
+        var canvas_template = $(options.event_canvas).html();
+
+
+
+        $.ajax({
+            url : options.remote_events,
+            dataType : 'json',
+            success : function(events){
+                console.log(events);
+            }
+        });
     }
 
     function switchMonth(next, month, year) {
