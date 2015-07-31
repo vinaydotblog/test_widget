@@ -1,6 +1,9 @@
 var CALENDAR = function () {
     var wrap, label,
         options,
+        canvas,
+        canvas_template,
+        container,
         months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     function init(opts) {
@@ -17,6 +20,11 @@ var CALENDAR = function () {
         console.log(label);
 
         if( options.event_canvas ) {
+
+            canvas = $(options.event_canvas),
+            canvas_template = canvas.html(),
+            container = canvas.parent();
+
             loadEvents()
         }
     }
@@ -54,15 +62,14 @@ function formatEvents(events){
 }
 
     function loadEvents(){
-        var canvas_template = $(options.event_canvas).html();
-
-
 
         $.ajax({
             url : options.remote_events,
             dataType : 'json',
             success : function(events){
-                console.log( formatEvents(events) );
+                var events_html = tmpl( canvas_template,  formatEvents(events) );
+
+                container.html(events_html);
             }
         });
     }
