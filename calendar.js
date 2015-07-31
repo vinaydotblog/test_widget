@@ -1,9 +1,11 @@
 var CALENDAR = function () {
     var wrap, label,
+        options,
         months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    function init(newWrap) {
-        wrap  = $(newWrap || "#cal-widget");
+    function init(options) {
+
+        wrap  = $(options.elem);
         label = wrap.find(".cal-month-year");
         wrap.find(".prev").bind("click.calendar", function () { switchMonth(false); });
         wrap.find(".next").bind("click.calendar", function () { switchMonth(true);  });
