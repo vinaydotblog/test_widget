@@ -61,13 +61,13 @@
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
         <script type="text/javascript" src="calendar.js"></script>
         <script>
-            var cal = CALENDAR();
 
-            cal.init({
+            new CALENDAR({
                 elem : "#cal-widget",
                 event_canvas : '#event-canvas-template',
                 remote_events : 'events.json'
             });
+
         </script>
         </body>
         </html>

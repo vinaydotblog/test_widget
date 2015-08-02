@@ -1,180 +1,216 @@
-var CALENDAR = function () {
-    var wrap = $(), label,
-        options,
-        canvas,
-        canvas_template,
-        container,
-        cur_month, cur_year
-        months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+(function($) {
 
-    function init(opts) {
+    "use strict";
 
-        options = opts;
+    /*
+     * Calendar Widget Class Constructor
+     * @param options Object
+     */
+    function CALENDAR(opts) {
+        this.init(opts);
+    }
 
-        cur_month = new Date().getMonth();
-        cur_year =  new Date().getFullYear();
+    // Make it a global widget
+    window.CALENDAR = CALENDAR;
 
-        wrap  = $(options.elem);
-        label = wrap.find(".cal-month-year");
-        wrap.find(".prev").bind("click.calendar", function () { switchMonth(false); });
-        wrap.find(".next").bind("click.calendar", function () { switchMonth(true);  });
-        label.bind("click", function () { switchMonth(null, cur_month, cur_year); });
-        label.click();
-       console.log(wrap);
-        console.log(label);
+    /*
+     * Static Private Properties
+     */
+    var months = [
+        "January", "February", "March",
+        "April", "May", "June", "July",
+        "August", "September", "October",
+        "November", "December"
+    ];
 
-        if( options.event_canvas ) {
+    CALENDAR.prototype = {
 
-            canvas = $(options.event_canvas),
-            canvas_template = canvas.html(),
-            container = canvas.parent();
+        // Class Properties
+        wrap: $(),
 
-            loadEvents(cur_month, cur_year);
+        today: new Date(),
 
-            // load events even on calendar change
-            wrap.bind('change', function(e, month, year){
-                loadEvents(cur_month, cur_year);
+        /*
+         * Initializer
+         */
+        init: function(opts) {
+            this.options = opts;
+
+            // Initial active month
+            this.active_month = this.today.getMonth();
+            this.active_year = this.today.getFullYear();
+
+            this.setOptions();
+
+        },
+
+        setOptions: function() {
+            var self = this;
+
+            this.cur_month = this.today.getMonth();
+            this.cur_year = this.today.getFullYear();
+
+            // Container Element
+            this.wrap = $(this.options.elem);
+            this.label = this.wrap.find(".cal-month-year");
+            this.wrap.find(".prev").bind("click.calendar", function() {
+                self.switchMonth(false);
             });
-        }
-    }
+            this.wrap.find(".next").bind("click.calendar", function() {
+                self.switchMonth(true);
+            });
+            // this.label.bind("click", function() {
+            //     self.switchMonth(null, this.cur_month, this.cur_year);
+            // });
+            self.switchMonth();
+        },
 
-// `tmpl()` is for attaching the function in jquery and develoer could use it in this page anywhere
-var tmpl = function(template, data) {
-    var i = 0,
-            len = data.length,
-            fragment = '';
-    // For each item in the object, make the necessary replacement
-    function replace(obj) {
-        var t, key, reg;
-        for (key in obj) {
-            reg = new RegExp('{{' + key + '}}', 'ig');
-            t = (t || template).replace(reg, obj[key]);
-        }
-        return t;
-    }
-    for (; i < len; i++) {
-        fragment += replace(data[i]);
-    }
-    return fragment;
-};
 
-function formatEvents(events){
-    return events.map(function(event){
-        var date = new Date(event.date);
+        switchMonth: function(direction) {
 
-        return {
-            month : months[date.getMonth()],
-            day : date.getDate(),
-            title : event.title
-        };
-    });
-}
 
-    function loadEvents(m, y){
+            this.setNextMonthYear();
 
-        $.ajax({
-            url : options.remote_events,
-            dataType : 'json',
-            data : { month : m, year : y }, // load events for current month
-            success : function(events){
-                var events_html = tmpl( canvas_template,  formatEvents(events) );
+            var cur_month = this.active_month;
+            var cur_year = this.active_year;
 
-                container.html(events_html);
+            // Emmit events whenver there is change in calendar date,
+            // so we can later do things by subscribing to these events
+            this.wrap.trigger('change', [this.active_month, this.active_year]);
+
+            console.profile("createCal");
+            var calendar = this.createCal();
+            console.profileEnd("createCal");
+
+            $("#cal-frame", this.wrap)
+                .find(".curr")
+                .removeClass("curr")
+                .addClass("temp")
+                .end()
+                .prepend(calendar.calendar())
+                .find(".temp")
+                .fadeOut("slow", function() {
+                    $(this).remove();
+                });
+            this.label.text(calendar.label);
+        },
+
+        setNextMonthYear : function(){
+            if( this.active_month === 11 ) {
+                this.active_month = 0; // set january
+                this.active_year += 1; // increment year
+            } else {
+                this.active_month += 1;
             }
-        });
-    }
+        },
 
-    function switchMonth(next, month, year) {
-        var curr = label.text().trim().split(" "), calendar, tempYear = parseInt(curr[1], 10);
 
-        month = month || ((next) ? ((curr[0] === "December") ? 0 : months.indexOf(curr[0]) + 1) : ( (curr[0] === "January") ? 11 : months.indexOf(curr[0]) - 1) );
-        year  = year  || ((next && month === 0) ? tempYear + 1 : (!next && month === 11) ? tempYear -1 : tempYear);
-
-        cur_month = month;
-        cur_year = cur_year;
-
-        console.log(month);
-        console.log(year);
-
-        // Emmit events whenver there is change in calendar date,
-        // so we can later do things by subscribing to these events
-        wrap.trigger('change', [month, year]);
-
-        console.profile("createCal");
-        calendar = createCal(year, month);
-        console.profileEnd("createCal");
-
-        $("#cal-frame", wrap)
-            .find(".curr")
-            .removeClass("curr")
-            .addClass("temp")
-            .end()
-            .prepend(calendar.calendar())
-            .find(".temp")
-            .fadeOut("slow", function () { $(this).remove(); });
-        label.text(calendar.label);
-    }
-
-    function createCal(year, month) {
-        var day = 1, i, j, haveDays = true,
-            startDay = new Date(year, month, day).getDay(),
-            daysInMonth = [31, (((year%4===0)&&(year%100!==0))||(year%400===0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ],
-            calendar = [];
-        if (createCal.cache[year]) {
-            if (createCal.cache[year][month]) {
-                return createCal.cache[year][month];
+        /*
+         * A templating method to bind data to views
+         */
+        tmpl: function(template, data) {
+            var i = 0,
+                len = data.length,
+                fragment = '';
+            // For each item in the object, make the necessary replacement
+            function replace(obj) {
+                var t, key, reg;
+                for (key in obj) {
+                    reg = new RegExp('{{' + key + '}}', 'ig');
+                    t = (t || template).replace(reg, obj[key]);
+                }
+                return t;
             }
-        } else {
-            createCal.cache[year] = {};
-        }
-        i = 0;
-        while(haveDays) {
-            calendar[i] = [];
-            for (j = 0; j < 7; j++) {
-                if (i === 0) {
-                    if (j === startDay) {
-                        calendar[i][j] = day++;
-                        startDay++;
+            for (; i < len; i++) {
+                fragment += replace(data[i]);
+            }
+            return fragment;
+        },
+
+        /*
+         */
+        formatEvents: function(events) {
+            return events.map(function(event) {
+                var date = new Date(event.date);
+
+                return {
+                    month: months[date.getMonth()],
+                    day: date.getDate(),
+                    title: event.title
+                };
+            });
+        },
+        
+        
+        createCal : function() {
+            var month = this.active_month, year = this.active_year;
+            var day = 1,
+                i, j, haveDays = true,
+                startDay = new Date(year, month, day).getDay(),
+                daysInMonth = [31, (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+                calendar = [];
+
+            if( !this.cache ) {
+                this.cache = {};
+            }
+
+            if (this.cache[year]) {
+                if (this.cache[year][month]) {
+                    return this.cache[year][month];
+                }
+            }
+            else {
+                this.cache[year] = {};
+            }
+            i = 0;
+            while (haveDays) {
+                calendar[i] = [];
+                for (j = 0; j < 7; j++) {
+                    if (i === 0) {
+                        if (j === startDay) {
+                            calendar[i][j] = day++;
+                            startDay++;
+                        }
                     }
-                } else if ( day <= daysInMonth[month]) {
-                    calendar[i][j] = day++;
-                } else {
-                    calendar[i][j] = "";
-                    haveDays = false;
+                    else if (day <= daysInMonth[month]) {
+                        calendar[i][j] = day++;
+                    }
+                    else {
+                        calendar[i][j] = "";
+                        haveDays = false;
+                    }
+                    if (day > daysInMonth[month]) {
+                        haveDays = false;
+                    }
                 }
-                if (day > daysInMonth[month]) {
-                    haveDays = false;
-                }
+                i++;
             }
-            i++;
+    
+    
+    
+    
+            for (i = 0; i < calendar.length; i++) {
+                calendar[i] = "<tr><a href='#'><td>" + calendar[i].join("</a></td><td><a href='#'>") + "</td></a></tr>";
+            }
+    
+            calendar = $("<tbody id='cal-content'>" + calendar.join("") + "</tbody").addClass("curr");
+    
+            $("td a:empty", calendar).parent().addClass("nil");
+            if (month === new Date().getMonth()) {
+                // $('td', calendar).filter(function () { return $(this).text() === new Date().getDate().toString(); }).addClass("today");
+            }
+    
+            this.cache[year][month] = {
+                calendar: function() {
+                    calendar.clone().insertAfter('thead');
+    
+                },
+                label: months[month] + " " + year
+            };
+    
+            return this.cache[year][month];
+    
         }
-
-
-
-
-        for (i = 0; i < calendar.length; i++) {
-            calendar[i] = "<tr><a href='#'><td>" + calendar[i].join("</a></td><td><a href='#'>") + "</td></a></tr>";
-        }
-
-        calendar = $("<tbody id='cal-content'>" + calendar.join("") + "</tbody").addClass("curr");
-
-        $("td a:empty", calendar).parent().addClass("nil");
-        if (month === new Date().getMonth()) {
-           // $('td', calendar).filter(function () { return $(this).text() === new Date().getDate().toString(); }).addClass("today");
-        }
-
-        createCal.cache[year][month] = { calendar : function () {
-            calendar.clone().insertAfter('thead');
-
-        }, label : months[month] + " " + year };
-
-        return createCal.cache[year][month];
-
     }
-    createCal.cache = {};
-    return {
-        init : init,
-        switchMonth : switchMonth,
-        createCal   : createCal
-    };
-};
+
+})(jQuery);
