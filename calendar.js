@@ -23,6 +23,8 @@
         "November", "December"
     ];
 
+    var weeks = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
     CALENDAR.prototype = {
 
         // Class Properties
@@ -40,8 +42,33 @@
             this.active_month = this.today.getMonth();
             this.active_year = this.today.getFullYear();
 
+            this.wrap = $(this.options.elem).find('.cal-wrapper')
+
             this.setOptions();
 
+        },
+
+        showEvents : function(){
+            var self = this;
+            this.options.loadEvents(function(events){
+
+                var canvas = $(self.options.event_canvas), template = canvas.html();
+
+                var formattedEvents = self.formatEvents(events)
+                var events_html = self.tmpl( template, formattedEvents);
+                canvas.parent().html(events_html);
+
+                self.highlightEvents(formattedEvents);
+            });
+        },
+
+        highlightEvents : function(events){
+            var self = this;
+            events.forEach(function(obj){
+                var selector = "[data-id=" + obj.day + "]";
+
+                $(selector, self.wrap).addClass('has-event');
+            });
         },
 
         setOptions: function() {
@@ -50,24 +77,36 @@
             this.cur_month = this.today.getMonth();
             this.cur_year = this.today.getFullYear();
 
-            // Container Element
-            this.wrap = $(this.options.elem);
-            this.label = this.wrap.find(".cal-month-year");
-            this.wrap.find(".prev").bind("click.calendar", function() {
-                self.switchMonth(false);
-            });
-            this.wrap.find(".next").bind("click.calendar", function() {
-                self.switchMonth(true);
-            });
-            // this.label.bind("click", function() {
-            //     self.switchMonth(null, this.cur_month, this.cur_year);
-            // });
+
             self.switchMonth();
+        },
+
+        buildHtml : function(){
+
+            var container = $('<div>', { 'class' : 'cal-container' });
+
+            var calendarHead = $('<div>', { 'class' : 'cal-header' });
+
+            var title = $('<span>', { 'class' : 'cal-month-year' });
+
+            var prev = $('<a>', { 'href' : '#', 'class' : 'prev', 'text' : 'Prev' });
+            var next = $('<a>', { 'href' : '#', 'class' : 'next', 'text' : 'next' });
+
+            calendarHead
+                .append(prev)
+                .append(title)
+                .append(next);
+
+            container
+                .append(calendarHead)
+                .append(this.calendarBody);
+
+            return container;
         },
 
 
         switchMonth: function(direction) {
-
+            var self = this;
 
             this.setNextMonthYear();
 
@@ -82,17 +121,44 @@
             var calendar = this.createCal();
             console.profileEnd("createCal");
 
-            $("#cal-frame", this.wrap)
-                .find(".curr")
-                .removeClass("curr")
-                .addClass("temp")
-                .end()
-                .prepend(calendar.calendar())
-                .find(".temp")
-                .fadeOut("slow", function() {
-                    $(this).remove();
-                });
-            this.label.text(calendar.label);
+
+            this.wrap.empty();
+
+            var container = this.buildHtml();
+            this.wrap.append( container );
+            container.append(calendar.calendar());
+            container.appendTo(this.wrap);
+
+
+            this.label = this.wrap.find(".cal-month-year");
+            
+            this.wrap.find('.cal-month-year')
+                        .html( months[this.active_month] + " " + this.active_year );
+
+            this.wrap.find('.prev').bind("click.calendar", function() {
+                self.switchMonth(false);
+            });
+            
+            this.wrap.find('.next').bind("click.calendar", function() {
+                self.switchMonth(true);
+            });
+
+
+            if( $.isFunction( this.options.loadEvents ) ) {
+                this.showEvents();
+            }
+
+            // $("#cal-frame", this.wrap)
+            //     .find(".curr")
+            //     .removeClass("curr")
+            //     .addClass("temp")
+            //     .end()
+            //     .prepend(calendar.calendar())
+            //     .find(".temp")
+            //     .fadeOut("slow", function() {
+            //         $(this).remove();
+            //     });
+            // this.label.text(calendar.label);
         },
 
         setNextMonthYear : function(){
@@ -136,7 +202,8 @@
                 return {
                     month: months[date.getMonth()],
                     day: date.getDate(),
-                    title: event.title
+                    title: event.title,
+                    date : date
                 };
             });
         },
@@ -190,19 +257,30 @@
     
     
             for (i = 0; i < calendar.length; i++) {
-                calendar[i] = "<tr><a href='#'><td>" + calendar[i].join("</a></td><td><a href='#'>") + "</td></a></tr>";
+                calendar[i] = "<tr><td><a href='#'>" + calendar[i].join("</a></td><td><a href='#'>") + "</td></a></tr>";
             }
+
+            var html = '<table><thead class="cal-days"><tr>'
+                            + "<td></span>"
+                            + weeks.join('</span></td><td></span>')
+                            + "</span></td>"
+                            + "</tr></thead></table>";
+
+            var calendarBody = $('<div>', { 'class' : 'cal-body' }).html( html );
     
             calendar = $("<tbody id='cal-content'>" + calendar.join("") + "</tbody").addClass("curr");
+
+            calendar.find('td:not(.nil)').each(function(){
+             $(this).attr('data-id', this.innerText)
+            });
+
+            calendarBody.find('table').append(calendar);
     
             $("td a:empty", calendar).parent().addClass("nil");
-            if (month === new Date().getMonth()) {
-                // $('td', calendar).filter(function () { return $(this).text() === new Date().getDate().toString(); }).addClass("today");
-            }
-    
+
             this.cache[year][month] = {
                 calendar: function() {
-                    calendar.clone().insertAfter('thead');
+                    return calendarBody.clone();
     
                 },
                 label: months[month] + " " + year

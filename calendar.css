@@ -74,6 +74,9 @@ th span{
     display: inline-block;
 }
 
+.has-event {
+    font-weight: bold;
+}
 
 
 

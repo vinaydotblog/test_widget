@@ -1,4 +1,4 @@
-        <!DOCTYPE html>
+
         <html>
         <head>
             <meta charset="utf-8" />
@@ -12,31 +12,11 @@
         <!--Start of Calendar Widget -->
 
         <div id="cal-widget">
-                <h2>Select a Payment Date</h2>
-            <div class="cal-container">
-                <div class="cal-header">
-                    <a href="#" class="prev">Previous</a>
-                    <span class="cal-month-year">
-                        JULY 2015
-                    </span>
-                    <a href="#" class="next">Next</a>
-                </div>
-                <div id="cal-frame">
-                    <table id="cal-data">
-                        <thead class="cal-days">
-                        <tr>
-                            <th><span>SUN</span></th>
-                            <th><span>MON</span></th>
-                            <th><span>TUE</span></th>
-                            <th><span>WED</span></th>
-                            <th><span>THU</span></th>
-                            <th><span>FRI</span></th>
-                            <th><span>SAT</span></th>
-                        </tr>
-                        </thead>
+            <h2>Select a Payment Date</h2>
 
-                    </table>
-                </div>
+            <div class="cal-wrapper">
+                
+
             </div>
 
             <div class="cal-container-events">
@@ -62,10 +42,19 @@
         <script type="text/javascript" src="calendar.js"></script>
         <script>
 
-            new CALENDAR({
+            var cal = new CALENDAR({
                 elem : "#cal-widget",
                 event_canvas : '#event-canvas-template',
-                remote_events : 'events.json'
+                
+                loadEvents : function(source){
+                    $.ajax({
+                        url : 'events.json',
+                        dataType : 'json',
+                        success : function(events){
+                            source(events);
+                        }
+                    });
+                }
             });
 
         </script>
