@@ -67,7 +67,9 @@
             events.forEach(function(obj){
                 var selector = "[data-id=" + obj.day + "]";
 
-                $(selector, self.wrap).addClass('has-event');
+                $(selector, self.wrap)
+                    .addClass('has-event')
+                    .attr('title', obj.title);
             });
         },
 
