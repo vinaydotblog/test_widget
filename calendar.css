@@ -78,5 +78,8 @@ th span{
     font-weight: bold;
 }
 
-
+.cal-today a {
+    text-decoration: underline;
+    background: #ddd;
+}
 

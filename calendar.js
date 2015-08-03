@@ -52,11 +52,16 @@
             var self = this;
             this.options.loadEvents(function(events){
 
-                var canvas = $(self.options.event_canvas), template = canvas.html();
+
+                if(!self.template) {
+                    var canvas = $(self.options.event_canvas);
+                    self.template = canvas.html();
+                    self.sidebar = canvas.parent();
+                }
 
                 var formattedEvents = self.formatEvents(events)
-                var events_html = self.tmpl( template, formattedEvents);
-                canvas.parent().html(events_html);
+                var events_html = self.tmpl( self.template, formattedEvents);
+                self.sidebar.html(events_html);
 
                 self.highlightEvents(formattedEvents);
             });
@@ -67,7 +72,7 @@
             events.forEach(function(obj){
                 var selector = "[data-id=" + obj.day + "]";
 
-                $(selector, self.wrap)
+                $(selector, self.wrap.find('.active-month'))
                     .addClass('has-event')
                     .attr('title', obj.title);
             });
@@ -110,7 +115,7 @@
         switchMonth: function(direction) {
             var self = this;
 
-            this.setNextMonthYear();
+            
 
             var cur_month = this.active_month;
             var cur_year = this.active_year;
@@ -120,7 +125,8 @@
             this.wrap.trigger('change', [this.active_month, this.active_year]);
 
             console.profile("createCal");
-            var calendar = this.createCal();
+            var calendar = this.createCal(true);
+
             console.profileEnd("createCal");
 
 
@@ -129,8 +135,15 @@
             var container = this.buildHtml();
             this.wrap.append( container );
             container.append(calendar.calendar());
-            container.appendTo(this.wrap);
 
+            if( this.options.showNextMonth ) {
+                this.setNextMonthYear();
+                var calendar2 = this.createCal();
+                container.append(calendar2.calendar());
+                this.setPrevMonthYear();
+            }
+
+            container.appendTo(this.wrap);
 
             this.label = this.wrap.find(".cal-month-year");
             
@@ -138,12 +151,19 @@
                         .html( months[this.active_month] + " " + this.active_year );
 
             this.wrap.find('.prev').bind("click.calendar", function() {
+                self.setPrevMonthYear();
                 self.switchMonth(false);
             });
             
             this.wrap.find('.next').bind("click.calendar", function() {
+                self.setNextMonthYear();
                 self.switchMonth(true);
             });
+
+            var selector = "[data-id=" + this.today.getDate() + "]";
+
+            $(selector, self.wrap.find('.active-month'))
+                .addClass('cal-today');
 
 
             if( $.isFunction( this.options.loadEvents ) ) {
@@ -169,6 +189,15 @@
                 this.active_year += 1; // increment year
             } else {
                 this.active_month += 1;
+            }
+        },
+
+        setPrevMonthYear : function(){
+            if( this.active_month === 0 ) {
+                this.active_month = 11; // set january
+                this.active_year -= 1; // increment year
+            } else {
+                this.active_month -= 1;
             }
         },
 
@@ -199,7 +228,7 @@
          */
         formatEvents: function(events) {
             return events.map(function(event) {
-                var date = new Date(event.date);
+                var date = new Date(event.date.replace(/\-/g, '/'));
 
                 return {
                     month: months[date.getMonth()],
@@ -211,7 +240,7 @@
         },
         
         
-        createCal : function() {
+        createCal : function(active) {
             var month = this.active_month, year = this.active_year;
             var day = 1,
                 i, j, haveDays = true,
@@ -269,6 +298,10 @@
                             + "</tr></thead></table>";
 
             var calendarBody = $('<div>', { 'class' : 'cal-body' }).html( html );
+
+            if(active) {
+                calendarBody.addClass('active-month');
+            }
     
             calendar = $("<tbody id='cal-content'>" + calendar.join("") + "</tbody").addClass("curr");
 
